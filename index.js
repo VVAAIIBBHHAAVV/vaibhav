@@ -1,58 +1,105 @@
-function fetchdata() {
 
-    fetch("https://reqres.in/api/users?delay=3")
-        .then(response => {
-            console.log(response);
-            return response.json();
-        })
-        .then(data => {
+// api url
+const api_url =
+	"https://reqres.in/api/users?delay=3";
 
-            console.log(data.data);
-            const html = data.data.map(user => {
-                return `
-                <div class="user">
-                <p><img src="${user.avatar}" alt="${user.first_name}" ></p>
-                 <p> Name : ${user.first_name}</p>
-                 <p> Email : ${user.email}</p>
-                 </div>
-                 `;
-            })
-                .join('');
-            console.log(html)
-            document.querySelector('#app')
-                .insertAdjacentHTML('afterbegin', html);
+// Defining async function
+async function getapi(url) {
 
-        })
-        .catch(error => {
-            console.log(error)
-        });
+	// Storing response
+	const response = await fetch(url);
+
+	// Storing data in form of JSON
+	var data = await response.json();
+	// console.log(data);
+	if (response) {
+		hideloader();
+	}
+	createCard(data)
+	show(data);
+	console.log(data["data"])
 }
-fetchdata();
+// Calling that async function
+getapi(api_url);
 
-
-function postdata() {
-
-    fetch("https://reqres.in/api/users?delay=3",{
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "name": "morpheus",
-            "job" : "leader"
-        })
-    })
-        .then(response => {
-            console.log(response);
-            return response.json();
-        })
-        .then(data => {
-        console.log(data)
-    })
-        .catch (error => {
-    console.log(error)
-});
+// Function to hide the loader
+function hideloader() {
+	document.getElementById('loading').style.display = 'none';
 }
 
-fetchdata();
+
+function createCard(data) {
+	let card = ``
+	for (let r of data["data"]) {
+		card +=
+			`
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-0 shadow " onclick="getdata(${r.id})" style="width: 18rem;">
+              <img src="${r.avatar}" class="card-img-top" alt="...">
+              <div class="card-body text-center">
+                <h5 class="card-title mb-0">Name</h5>
+                <div class="card-text text-black-50">${r.first_name} ${r.last_name}</div>
+              </div>
+            </div>
+          </div>
+    
+        `
+
+
+	}
+	document.getElementById("employeesdata").innerHTML = card;
+}
+
+function getdata(id) {
+	var u = `https://reqres.in/api/users/${id}`
+	getdetails(u)
+}
+
+function hideeverything() {
+	document.getElementById('employeesdata').style.display = 'none';
+}
+
+async function getdetails(url) {
+
+	// Storing response
+	const response = await fetch(url);
+
+	// Storing data in form of JSON
+	var data = await response.json();
+	// console.log(data);
+	if (response) {
+		hideloader();
+	}
+	hideeverything();
+	console.log(data["data"]);
+	createDetails(data["data"]);
+	console.log("done")
+}
+
+function createDetails(data) {
+	console.log("called")
+	let cardd =
+		`
+          <div style="text-align:center" class="container">
+         <div class="card" style="width: 18rem;">
+        <img src="${data.avatar}" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">id:  ${data.id}</h5>
+          <h5 class="card-title">First Name: ${data.first_name} </h5>
+          <h5 class="card-title">Second Name: ${data.last_name} </h5>
+          <h5 class="card-title">email address: ${data.email} </h5>
+
+          
+          </div>
+        </div>
+        </div>
+                
+    
+        `
+
+
+	document.getElementById("employeesdetails").innerHTML = cardd;
+	console.log("final reach")
+}
 
